@@ -91,7 +91,7 @@ public class GoogleSpeechRecognizer extends com.dydxtech.openapps.SpeechRecogniz
     public GoogleSpeechRecognizer(Context context, AudioUI uiReference) {
         lastVolume = 0;
         doubleMetaphone.setMaxCodeLen(1000);
-        String hot_phrase = PreferenceManager.getDefaultSharedPreferences(context).getString("hot_phrase", context.getResources().getString(R.string.hot_phrase));
+        String hot_phrase = PreferenceManager.getDefaultSharedPreferences(context).getString("hot_phrase", "Open Apps");
         Log.d("hot_phrase", hot_phrase);
 
         for (String hotword : hot_phrase.split(",")) {
