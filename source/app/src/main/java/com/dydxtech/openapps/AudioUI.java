@@ -60,7 +60,7 @@ public class AudioUI {
         if (listenHotword) {
 
                 speechRecognizer = new GoogleSpeechRecognizer(context, this);
-
+                startListening();
         }
 
         TelephonyManager mgr = (TelephonyManager) context
