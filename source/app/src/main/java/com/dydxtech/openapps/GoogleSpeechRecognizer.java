@@ -20,11 +20,13 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.apache.commons.codec.language.DoubleMetaphone;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
@@ -261,6 +263,8 @@ public class GoogleSpeechRecognizer extends com.dydxtech.openapps.SpeechRecogniz
     }
 
     private void receiveWhatWasHeard(List<String> heard) {
+        //DEBUG
+        Toast.makeText(context, heard.toString(), Toast.LENGTH_LONG).show();
         if (listener != null) {
             if (!listener.onHeard(heard)) {
                 startListening();
