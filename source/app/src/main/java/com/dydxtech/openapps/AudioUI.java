@@ -34,7 +34,6 @@ public class AudioUI {
                 // when
                 // listening
                 // started
-
                 startListening();
             }
             super.onCallStateChanged(state, incomingNumber);
@@ -58,7 +57,6 @@ public class AudioUI {
         }
 
         if (listenHotword) {
-
                 speechRecognizer = new GoogleSpeechRecognizer(context, this);
                 startListening();
         }
@@ -99,7 +97,7 @@ public class AudioUI {
                 CheckIfAppBlackListedService.class);
         context.stopService(i);
 
-        stopListening();
+        //stopListening();
 
         WakeupActivity.useNewTask = false;
         if (!ScreenReceiver.isScreenOn

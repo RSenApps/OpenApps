@@ -36,7 +36,6 @@ public class WakeupActivity extends Activity {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(WakeupActivity.this, "Something happened", Toast.LENGTH_SHORT).show();
             }
         };
         handler.postDelayed(runnable, 100);

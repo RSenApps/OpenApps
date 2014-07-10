@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">OpenApps</string>
-    <string name="hot_phrase">Okay Google</string>
+    <string name="hot_phrase">Hello World</string>
+    <string name="short_desc">Use your voice to open apps</string>
 </resources>

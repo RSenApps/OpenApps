@@ -43,7 +43,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Use your voice to open apps"
+            android:text="@string/short_desc"
             android:gravity="center"
             android:fontFamily="sans-serif-light"
             android:layout_marginTop="16dp"
