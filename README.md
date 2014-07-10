@@ -4,4 +4,4 @@ Use your voice to open apps
 
 QA Testing
 --------------
-All builds in /testing Keystore password: kellster2014
+All builds in /testing. Keystore password: kellster2014
