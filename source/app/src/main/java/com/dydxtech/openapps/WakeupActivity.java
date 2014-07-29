@@ -36,6 +36,9 @@ public class WakeupActivity extends Activity {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
+                Intent i = new Intent (WakeupActivity.this, MainActivity.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(i);
             }
         };
         handler.postDelayed(runnable, 100);
