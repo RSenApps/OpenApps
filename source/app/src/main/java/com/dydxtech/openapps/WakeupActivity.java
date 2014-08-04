@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 public class WakeupActivity extends Activity {
     public static boolean useNewTask = false;
@@ -17,31 +16,19 @@ public class WakeupActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         getWindow().setFlags(
-                WindowManager.LayoutParams.FLAG_FULLSCREEN
-                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
                         | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                         | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN
-                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
                         | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-                        | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-        );
+                        | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
         // Your code here - Or if it doesn't trigger, see below
     }
 
     @Override
     public void onAttachedToWindow() {
-        final Handler handler = new Handler();
-        final Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                Intent i = new Intent (WakeupActivity.this, MainActivity.class);
-                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(i);
-            }
-        };
-        handler.postDelayed(runnable, 100);
+        finish();
     }
 
     @Override

@@ -6,7 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.ResolveInfo;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -93,7 +95,7 @@ public class GoogleSpeechRecognizer extends com.dydxtech.openapps.SpeechRecogniz
     public GoogleSpeechRecognizer(Context context, AudioUI uiReference) {
         lastVolume = 0;
         doubleMetaphone.setMaxCodeLen(1000);
-        String hot_phrase = PreferenceManager.getDefaultSharedPreferences(context).getString("hot_phrase", "Open Apps");
+        String hot_phrase = PreferenceManager.getDefaultSharedPreferences(context).getString("hot_phrase", context.getResources().getString(R.string.hot_phrase));
         Log.d("hot_phrase", hot_phrase);
 
         for (String hotword : hot_phrase.split(",")) {
@@ -263,14 +265,35 @@ public class GoogleSpeechRecognizer extends com.dydxtech.openapps.SpeechRecogniz
     }
 
     private void receiveWhatWasHeard(List<String> heard) {
+        stopListening();
         //DEBUG
         Toast.makeText(context, heard.toString(), Toast.LENGTH_LONG).show();
+
+        String userInput =  heard.get(0).toLowerCase();
+        String appName = userInput.replace(hotwords.get(0), "").trim();
+
+        //Launch the app by the name
+        try {
+            final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+            mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+            PackageManager pm = context.getPackageManager();
+            final List<ResolveInfo> appList = pm.queryIntentActivities( mainIntent, 0);
+            for(ResolveInfo app : appList) {
+                String name = app.loadLabel(pm).toString().toLowerCase();
+                if(appName.startsWith(name)) {
+                    Intent LaunchIntent = pm.getLaunchIntentForPackage(app.activityInfo.packageName);
+                    context.startActivity(LaunchIntent);
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         if (listener != null) {
             if (!listener.onHeard(heard)) {
                 startListening();
-
             }
-
             return;
         }
         /*
@@ -312,7 +335,6 @@ public class GoogleSpeechRecognizer extends com.dydxtech.openapps.SpeechRecogniz
 
         // quietly start again
         startListening();
-
     }
 
     @Override

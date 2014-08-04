@@ -21,7 +21,7 @@ public class ScreenReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(context);
-		boolean screenOff = prefs.getBoolean("listen_screen_off", false);
+		boolean screenOff = prefs.getBoolean("listen_screen_off", true);
 		
 		if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
 

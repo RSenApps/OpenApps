@@ -85,7 +85,6 @@ public class MainActivity extends Activity implements SpeechRecognizerListener {
 
     @Override
     public boolean onHeard(List<String> heard) {
-        Toast.makeText(this, "Heard hot phrase", Toast.LENGTH_LONG).show();
         return false;
     }
 }

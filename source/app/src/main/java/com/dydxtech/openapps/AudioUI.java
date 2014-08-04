@@ -5,7 +5,6 @@ import android.app.KeyguardManager.KeyguardLock;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
@@ -57,7 +56,7 @@ public class AudioUI {
         }
 
         if (listenHotword) {
-                speechRecognizer = new GoogleSpeechRecognizer(context, this);
+            speechRecognizer = new GoogleSpeechRecognizer(context, this);
         }
 
         TelephonyManager mgr = (TelephonyManager) context
@@ -112,9 +111,7 @@ public class AudioUI {
             context.startService(i);
         }
         context.startActivity(new Intent(context, WakeupActivity.class)
-                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK
-
-                        | Intent.FLAG_FROM_BACKGROUND));
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_FROM_BACKGROUND));
 
     }
 
@@ -136,7 +133,6 @@ public class AudioUI {
     public void HotwordHeard() {
         activateGoogleNow();
     }
-
 
 
 }
