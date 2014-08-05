@@ -32,6 +32,8 @@ public class CheckIfAppBlackListedService extends Service {
     }
 
     public static boolean checkIfBlacklistedBecauseOfMic(Context context, String pkg) {
+        return false; //don't blacklist because of mic anymore...
+        /*
         if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("blacklist_mic", true)) {
             return false;
         }
@@ -46,6 +48,7 @@ public class CheckIfAppBlackListedService extends Service {
 
         String[] requestedPermissions = packageInfo.requestedPermissions;
         return Arrays.asList(requestedPermissions).contains(Manifest.permission.RECORD_AUDIO);
+        */
     }
 
     @Override

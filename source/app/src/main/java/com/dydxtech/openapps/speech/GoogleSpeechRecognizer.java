@@ -6,7 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.ResolveInfo;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -246,35 +248,20 @@ public class GoogleSpeechRecognizer extends com.dydxtech.openapps.speech.SpeechR
     }
 
     private void receiveWhatWasHeard(ArrayList<String> heard) {
-        if (listener != null) {
-            if (!listener.onHeard(heard)) {
-                startListening();
-            }
-            return;
-        }
-
-        //Process the user input
-        Intent intent = new Intent(context, LaunchActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
-        intent.putStringArrayListExtra(Constants.KEY_USER_INPUT, heard);
-        context.startActivity(intent);
 
         // find the target word
         for (String possible : heard) {
-            String possibleEncoded = possible;
-            if (optimizeEnglish) {
-                possibleEncoded = doubleMetaphone.encode(possible);
-            }
+
             int hotwordIndex = 1;
             for (String hotword : hotwords) {
-                String hotwordEncoded = hotword;
-                if (optimizeEnglish) {
-                    hotwordEncoded = doubleMetaphone.encode(hotword);
-                }
+
                 try {
-                    if (possibleEncoded.toLowerCase().contains(hotwordEncoded.toLowerCase())) {
+                    if (possible.toLowerCase().contains(hotword.toLowerCase())) {
                         if (hotwordIndex <= hotwordCount) {
-                            uiReference.HotwordHeard();
+                            String pkgName = getPackageNameForApp(possible.split(hotword) [1]);//gets part after hotword
+                            if (pkgName != null) {
+                                uiReference.HotwordHeard(pkgName);
+                            }
                         } else {
                             startListening();
                         }
@@ -288,7 +275,20 @@ public class GoogleSpeechRecognizer extends com.dydxtech.openapps.speech.SpeechR
         // quietly start again
         startListening();
     }
-
+    public String getPackageNameForApp(String name)
+    {
+        PackageManager pm = context.getPackageManager();
+        final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        final List<ResolveInfo> appList = pm.queryIntentActivities(mainIntent, 0);
+        for (ResolveInfo app : appList) {
+            String appname = app.loadLabel(pm).toString().toLowerCase();
+            if (name.toLowerCase().trim().startsWith(appname.toLowerCase().trim())) {
+                return app.activityInfo.packageName;
+            }
+        }
+        return null;
+    }
     @Override
     public void onError(int errorCode) {
         if (!listeningPaused) { // prevent restarting if shouldn't be listening

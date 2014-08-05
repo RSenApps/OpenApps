@@ -2,12 +2,16 @@ package com.dydxtech.openapps.activities;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.dydxtech.openapps.R;
 import com.dydxtech.openapps.receivers.ScreenReceiver;
 import com.dydxtech.openapps.services.CheckIfAppBlackListedService;
 
@@ -22,14 +26,33 @@ public class WakeupActivity extends Activity {
                         | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                         | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
         );
-        finish();
+        
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
     }
+    @Override
+    public void onAttachedToWindow() {
+        final String pkgName = getIntent().getStringExtra("pkg_name");
+        final Handler handler = new Handler();
+        final Runnable runnable = new Runnable() {
 
+            @Override
+            public void run() {
+                final MediaPlayer mp = MediaPlayer.create(WakeupActivity.this, R.raw.heard);
+                mp.start();
+                PackageManager pm = getPackageManager();
+                Intent LaunchIntent = pm.getLaunchIntentForPackage(pkgName);
+                startActivity(LaunchIntent);
+                overridePendingTransition(R.anim.show_bottom, android.R.anim.fade_out);
+
+            }
+        };
+        handler.postDelayed(runnable, 100);
+
+    }
     @Override
     public void onPause() {
         super.onPause();

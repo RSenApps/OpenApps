@@ -5,10 +5,14 @@ import android.app.KeyguardManager.KeyguardLock;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.media.MediaPlayer;
 import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
+import com.dydxtech.openapps.R;
 import com.dydxtech.openapps.activities.LaunchActivity;
 import com.dydxtech.openapps.activities.WakeupActivity;
 import com.dydxtech.openapps.receivers.KeyguardReceiver;
@@ -19,6 +23,7 @@ import com.dydxtech.openapps.speech.GoogleSpeechRecognizer;
 import com.dydxtech.openapps.speech.SpeechRecognizer;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Copyright RSenApps 2014
@@ -101,7 +106,7 @@ public class AudioUI {
         }
     }
 
-    public void HotwordHeard() {
+    public void HotwordHeard(String pkgName) {
         activationCount++;
         ScreenReceiver.isActivating = true;
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -121,5 +126,11 @@ public class AudioUI {
             i.setAction("GNACTIVATED");
             context.startService(i);
         }
+
+        context.startActivity(new Intent(context, WakeupActivity.class)
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+                        | Intent.FLAG_FROM_BACKGROUND).putExtra("pkg_name", pkgName));
     }
+
 }

@@ -15,6 +15,7 @@ import com.dydxtech.openapps.utils.Constants;
 import java.util.ArrayList;
 import java.util.List;
 
+//no longer used...
 public class LaunchActivity extends Activity {
 
     @Override
