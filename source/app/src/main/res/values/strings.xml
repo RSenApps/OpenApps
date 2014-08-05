@@ -1,5 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">OpenApps</string>
     <string name="hot_phrase">open</string>
     <string name="short_desc">Use your voice to open apps</string>
+    <string name="title_activity_launch">LaunchActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
 </resources>

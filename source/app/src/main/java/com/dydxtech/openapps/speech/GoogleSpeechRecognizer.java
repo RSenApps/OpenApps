@@ -6,9 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.pm.ResolveInfo;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,15 +20,16 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.dydxtech.openapps.R;
+import com.dydxtech.openapps.activities.LaunchActivity;
 import com.dydxtech.openapps.receivers.KeyguardReceiver;
 import com.dydxtech.openapps.receivers.ScreenReceiver;
 import com.dydxtech.openapps.services.CheckIfAppBlackListedService;
 import com.dydxtech.openapps.services.CheckIfMusicPlayingService;
 import com.dydxtech.openapps.services.MyService;
 import com.dydxtech.openapps.utils.AudioUI;
+import com.dydxtech.openapps.utils.Constants;
 
 import org.apache.commons.codec.language.DoubleMetaphone;
 
@@ -102,8 +101,8 @@ public class GoogleSpeechRecognizer extends com.dydxtech.openapps.speech.SpeechR
     public GoogleSpeechRecognizer(Context context, AudioUI uiReference) {
         lastVolume = 0;
         doubleMetaphone.setMaxCodeLen(1000);
-        String hot_phrase = PreferenceManager.getDefaultSharedPreferences(context).getString("hot_phrase", context.getResources().getString(R.string.hot_phrase));
-        Log.d("hot_phrase", hot_phrase);
+        String hot_phrase = PreferenceManager.getDefaultSharedPreferences(context).getString(Constants.KEY_HOT_PHRASE, context.getResources().getString(R.string.hot_phrase));
+        Log.d(Constants.KEY_HOT_PHRASE, hot_phrase);
 
         for (String hotword : hot_phrase.split(",")) {
             hotwords.add(hotword.trim());
@@ -235,7 +234,7 @@ public class GoogleSpeechRecognizer extends com.dydxtech.openapps.speech.SpeechR
             mAudioManager.setStreamMute(BEEP_STREAM, isMuted);
         }
         if ((results != null) && results.containsKey(SpeechRecognizer.RESULTS_RECOGNITION)) {
-            List<String> heard = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+            ArrayList<String> heard = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
             if (heard == null) {
                 startListening();
                 return;
@@ -246,45 +245,19 @@ public class GoogleSpeechRecognizer extends com.dydxtech.openapps.speech.SpeechR
         }
     }
 
-    private void receiveWhatWasHeard(List<String> heard) {
-        stopListening();
-        //DEBUG
-        Toast.makeText(context, heard.toString(), Toast.LENGTH_LONG).show();
-
-        String userInput = heard.get(0).toLowerCase();
-        String appName = userInput.replace(hotwords.get(0), "").trim();
-
-        //Launch the app by the name
-        try {
-            final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
-            mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-            PackageManager pm = context.getPackageManager();
-            final List<ResolveInfo> appList = pm.queryIntentActivities(mainIntent, 0);
-            for (ResolveInfo app : appList) {
-                String name = app.loadLabel(pm).toString().toLowerCase();
-                if (appName.startsWith(name)) {
-                    Intent LaunchIntent = pm.getLaunchIntentForPackage(app.activityInfo.packageName);
-                    context.startActivity(LaunchIntent);
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+    private void receiveWhatWasHeard(ArrayList<String> heard) {
         if (listener != null) {
             if (!listener.onHeard(heard)) {
                 startListening();
             }
             return;
         }
-        /*
-         * if
-		 * (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(
-		 * "speech_debug", false)) { // DEBUG: String text = ""; for (String
-		 * string : heard) { text += string + "\n"; } Toast.makeText(context,
-		 * text, Toast.LENGTH_LONG).show(); // DEBUG end }
-		 */
+
+        //Process the user input
+        Intent intent = new Intent(context, LaunchActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
+        intent.putStringArrayListExtra(Constants.KEY_USER_INPUT, heard);
+        context.startActivity(intent);
 
         // find the target word
         for (String possible : heard) {
@@ -312,7 +285,6 @@ public class GoogleSpeechRecognizer extends com.dydxtech.openapps.speech.SpeechR
                 hotwordIndex++;
             }
         }
-
         // quietly start again
         startListening();
     }

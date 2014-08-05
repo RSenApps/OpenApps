@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
+import com.dydxtech.openapps.activities.LaunchActivity;
 import com.dydxtech.openapps.activities.WakeupActivity;
 import com.dydxtech.openapps.receivers.KeyguardReceiver;
 import com.dydxtech.openapps.receivers.ScreenReceiver;
@@ -16,6 +17,8 @@ import com.dydxtech.openapps.services.CheckIfAppBlackListedService;
 import com.dydxtech.openapps.services.MyService;
 import com.dydxtech.openapps.speech.GoogleSpeechRecognizer;
 import com.dydxtech.openapps.speech.SpeechRecognizer;
+
+import java.util.ArrayList;
 
 /**
  * Copyright RSenApps 2014
@@ -87,7 +90,18 @@ public class AudioUI {
 
     }
 
-    public void activateGoogleNow() {
+    public void stop() {
+        WakelockManager.releaseWakelock();
+        if (listenHotword) {
+            speechRecognizer.stop();
+        }
+        TelephonyManager mgr = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        if (mgr != null) {
+            mgr.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
+        }
+    }
+
+    public void HotwordHeard() {
         activationCount++;
         ScreenReceiver.isActivating = true;
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -107,23 +121,5 @@ public class AudioUI {
             i.setAction("GNACTIVATED");
             context.startService(i);
         }
-        context.startActivity(new Intent(context, WakeupActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_FROM_BACKGROUND));
     }
-
-    public void stop() {
-        WakelockManager.releaseWakelock();
-        if (listenHotword) {
-            speechRecognizer.stop();
-        }
-        TelephonyManager mgr = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        if (mgr != null) {
-            mgr.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
-        }
-    }
-
-    public void HotwordHeard() {
-        activateGoogleNow();
-    }
-
-
 }

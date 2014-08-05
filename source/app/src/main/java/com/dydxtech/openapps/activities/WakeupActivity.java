@@ -6,6 +6,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.dydxtech.openapps.receivers.ScreenReceiver;
 import com.dydxtech.openapps.services.CheckIfAppBlackListedService;
@@ -16,21 +17,11 @@ public class WakeupActivity extends Activity {
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        getWindow().setFlags(
-                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
-                        | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-                        | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON,
+        getWindow().addFlags(
                 WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
                         | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                         | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
         );
-
-        // Your code here - Or if it doesn't trigger, see below
-    }
-
-    @Override
-    public void onAttachedToWindow() {
         finish();
     }
 
