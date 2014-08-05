@@ -49,13 +49,13 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/jni" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/rs" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/res" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/resources" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/aidl" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/assets" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidtest/res" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidtest/resources" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidtest/aidl" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidtest/assets" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidtest/java" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/jni" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/rs" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidtest/jni" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidtest/rs" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates" />
       <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
     </content>
