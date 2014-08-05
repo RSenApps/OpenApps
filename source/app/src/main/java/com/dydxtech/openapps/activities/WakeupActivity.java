@@ -1,13 +1,14 @@
-package com.dydxtech.openapps;
+package com.dydxtech.openapps.activities;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.view.WindowManager;
-import android.widget.Toast;
+
+import com.dydxtech.openapps.receivers.ScreenReceiver;
+import com.dydxtech.openapps.services.CheckIfAppBlackListedService;
 
 public class WakeupActivity extends Activity {
     public static boolean useNewTask = false;
@@ -17,12 +18,10 @@ public class WakeupActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         getWindow().setFlags(
-                WindowManager.LayoutParams.FLAG_FULLSCREEN
-                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
                         | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                         | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN
-                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
                         | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                         | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
         );
@@ -32,34 +31,18 @@ public class WakeupActivity extends Activity {
 
     @Override
     public void onAttachedToWindow() {
-        final Handler handler = new Handler();
-        final Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                Intent i = new Intent (WakeupActivity.this, MainActivity.class);
-                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(i);
-            }
-        };
-        handler.postDelayed(runnable, 100);
+        finish();
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-
-        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-
-        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Intent i = new Intent(WakeupActivity.this,
-                CheckIfAppBlackListedService.class);
+        Intent i = new Intent(WakeupActivity.this, CheckIfAppBlackListedService.class);
         startService(i);
 
         ScreenReceiver.isActivating = false;

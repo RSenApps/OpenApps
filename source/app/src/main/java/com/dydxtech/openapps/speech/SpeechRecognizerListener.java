@@ -1,4 +1,4 @@
-package com.dydxtech.openapps;
+package com.dydxtech.openapps.speech;
 
 import java.util.List;
 

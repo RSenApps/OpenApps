@@ -1,10 +1,13 @@
-package com.dydxtech.openapps;
+package com.dydxtech.openapps.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+
+import com.dydxtech.openapps.utils.AudioUI;
+import com.dydxtech.openapps.services.MyService;
 
 /**
  * Copyright RSenApps 2014
@@ -21,7 +24,7 @@ public class ScreenReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(context);
-		boolean screenOff = prefs.getBoolean("listen_screen_off", false);
+		boolean screenOff = prefs.getBoolean("listen_screen_off", true);
 		
 		if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
 

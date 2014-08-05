@@ -1,4 +1,4 @@
-package com.dydxtech.openapps;
+package com.dydxtech.openapps.activities;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -17,6 +17,8 @@ import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
 
+
+import com.dydxtech.openapps.R;
 
 import java.util.List;
 

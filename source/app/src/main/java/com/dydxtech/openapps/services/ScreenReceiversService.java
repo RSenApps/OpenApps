@@ -1,9 +1,12 @@
-package com.dydxtech.openapps;
+package com.dydxtech.openapps.services;
 
 import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
+
+import com.dydxtech.openapps.receivers.KeyguardReceiver;
+import com.dydxtech.openapps.receivers.ScreenReceiver;
 
 public class ScreenReceiversService extends Service {
     private static ScreenReceiver mReceiver = new ScreenReceiver();

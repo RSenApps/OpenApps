@@ -1,4 +1,4 @@
-package com.dydxtech.openapps;
+package com.dydxtech.openapps.activities;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -8,7 +8,13 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
-import android.widget.Toast;
+
+import com.dydxtech.openapps.utils.AudioUI;
+import com.dydxtech.openapps.services.CheckIfMusicPlayingService;
+import com.dydxtech.openapps.services.MyService;
+import com.dydxtech.openapps.R;
+import com.dydxtech.openapps.services.ScreenReceiversService;
+import com.dydxtech.openapps.speech.SpeechRecognizerListener;
 
 import java.util.List;
 
@@ -57,22 +63,18 @@ public class MainActivity extends Activity implements SpeechRecognizerListener {
 
     private void startService() {
         AudioUI.activationCount = 0;
-
         startService(new Intent(this, ScreenReceiversService.class));
         startService(myServiceIntent);
-
         PreferenceManager.getDefaultSharedPreferences(MainActivity.this).edit().putLong("lastStartedTime", System.currentTimeMillis()).commit();
     }
 
     private void stopService() {
         stopService(new Intent(this, ScreenReceiversService.class));
         stopService(new Intent(getApplicationContext(), CheckIfMusicPlayingService.class));
-
         try {
             AudioUI.lock.reenableKeyguard();
         } catch (Exception e) {
         }
-
         stopService(myServiceIntent);
     }
 
@@ -85,7 +87,6 @@ public class MainActivity extends Activity implements SpeechRecognizerListener {
 
     @Override
     public boolean onHeard(List<String> heard) {
-        Toast.makeText(this, "Heard hot phrase", Toast.LENGTH_LONG).show();
         return false;
     }
 }

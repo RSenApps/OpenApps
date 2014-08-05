@@ -1,4 +1,4 @@
-package com.dydxtech.openapps;
+package com.dydxtech.openapps.speech;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -8,7 +8,6 @@ import android.preference.PreferenceManager;
  * Copyright RSenApps 2014
  */
 public abstract class SpeechRecognizer {
-
 
     public abstract void startListening();
 

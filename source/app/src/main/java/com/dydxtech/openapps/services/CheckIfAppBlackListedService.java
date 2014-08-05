@@ -1,4 +1,4 @@
-package com.dydxtech.openapps;
+package com.dydxtech.openapps.services;
 
 import android.Manifest;
 import android.app.ActivityManager;
@@ -11,6 +11,9 @@ import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+
+import com.dydxtech.openapps.utils.AudioUI;
+import com.dydxtech.openapps.receivers.ScreenReceiver;
 
 import java.util.Arrays;
 import java.util.HashSet;

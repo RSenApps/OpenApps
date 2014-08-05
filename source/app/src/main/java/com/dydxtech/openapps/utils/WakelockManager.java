@@ -1,10 +1,8 @@
-package com.dydxtech.openapps;
+package com.dydxtech.openapps.utils;
 
 import android.content.Context;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.provider.Settings;
-import android.provider.Settings.SettingNotFoundException;
 
 /**
  * Copyright RSenApps 2014
@@ -15,8 +13,7 @@ public class WakelockManager {
     private static WakeLock screenOnWakelock;
 
     public static void acquireWakelock(Context context) {
-        PowerManager pm = (PowerManager) context
-                .getSystemService(Context.POWER_SERVICE);
+        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "OpenMic");
         wakeLock.acquire();
 
@@ -31,14 +28,12 @@ public class WakelockManager {
     }
 
     public static void turnOnScreen(Context context) {
-        PowerManager pm = (PowerManager) context
-                .getSystemService(Context.POWER_SERVICE);
+        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         if (pm.isScreenOn()) {
             return;
         }
         if (screenOnWakelock == null) {
-            screenOnWakelock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK
-                    | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Open Mic screen");
+            screenOnWakelock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Open Mic screen");
         }
         if (screenOnWakelock.isHeld()) {
             screenOnWakelock.release();
@@ -46,8 +41,6 @@ public class WakelockManager {
             screenOnWakelock.acquire(15000);
         }
     }
-
-
 
 
 }

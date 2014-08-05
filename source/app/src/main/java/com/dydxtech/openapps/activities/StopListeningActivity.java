@@ -1,4 +1,4 @@
-package com.dydxtech.openapps;
+package com.dydxtech.openapps.activities;
 
 /*
  * Copyright 2013 two forty four a.m. LLC <http://www.twofortyfouram.com>
@@ -15,7 +15,10 @@ package com.dydxtech.openapps;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+
+import com.dydxtech.openapps.services.MyService;
+import com.dydxtech.openapps.services.ScreenReceiversService;
+import com.dydxtech.openapps.utils.AudioUI;
 
 /**
  * This is the "fire" BroadcastReceiver for a Locale Plug-in setting.
@@ -23,11 +26,7 @@ import android.preference.PreferenceManager;
  * @see com.twofortyfouram.locale.Intent#ACTION_FIRE_SETTING
  * @see com.twofortyfouram.locale.Intent#EXTRA_BUNDLE
  */
-
-/**
- * Copyright RSenApps 2014
- */
-public final class StartListeningActivity extends Activity {
+public final class StopListeningActivity extends Activity {
 
     /**
      * @param context {@inheritDoc}.
@@ -40,12 +39,13 @@ public final class StartListeningActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final Intent myServiceIntent = new Intent(
-                getApplicationContext(), MyService.class);
-        startService(new Intent(this, ScreenReceiversService.class));
-
-
-            startService(myServiceIntent);
+        final Intent myServiceIntent = new Intent(getApplicationContext(), MyService.class);
+        stopService(new Intent(this, ScreenReceiversService.class));
+        try {
+            AudioUI.lock.reenableKeyguard();
+        } catch (Exception e) {
+        }
+        stopService(myServiceIntent);
         finish();
     }
 

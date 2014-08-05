@@ -1,4 +1,4 @@
-package com.dydxtech.openapps;
+package com.dydxtech.openapps.speech;
 
 import android.app.ActivityManager;
 import android.content.ComponentName;
@@ -6,7 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.ResolveInfo;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,11 +24,18 @@ import android.speech.SpeechRecognizer;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.dydxtech.openapps.R;
+import com.dydxtech.openapps.receivers.KeyguardReceiver;
+import com.dydxtech.openapps.receivers.ScreenReceiver;
+import com.dydxtech.openapps.services.CheckIfAppBlackListedService;
+import com.dydxtech.openapps.services.CheckIfMusicPlayingService;
+import com.dydxtech.openapps.services.MyService;
+import com.dydxtech.openapps.utils.AudioUI;
+
 import org.apache.commons.codec.language.DoubleMetaphone;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
@@ -36,7 +45,7 @@ import java.util.List;
  *
  * @author Ryan
  */
-public class GoogleSpeechRecognizer extends com.dydxtech.openapps.SpeechRecognizer implements RecognitionListener {
+public class GoogleSpeechRecognizer extends com.dydxtech.openapps.speech.SpeechRecognizer implements RecognitionListener {
     // Handler interface
 
     static final int MSG_RECOGNIZER_START_LISTENING = 1;
@@ -93,7 +102,7 @@ public class GoogleSpeechRecognizer extends com.dydxtech.openapps.SpeechRecogniz
     public GoogleSpeechRecognizer(Context context, AudioUI uiReference) {
         lastVolume = 0;
         doubleMetaphone.setMaxCodeLen(1000);
-        String hot_phrase = PreferenceManager.getDefaultSharedPreferences(context).getString("hot_phrase", "Open Apps");
+        String hot_phrase = PreferenceManager.getDefaultSharedPreferences(context).getString("hot_phrase", context.getResources().getString(R.string.hot_phrase));
         Log.d("hot_phrase", hot_phrase);
 
         for (String hotword : hot_phrase.split(",")) {
@@ -109,6 +118,7 @@ public class GoogleSpeechRecognizer extends com.dydxtech.openapps.SpeechRecogniz
                 BEEP_STREAM = AudioManager.STREAM_MUSIC;
             }
         } catch (NameNotFoundException e) {
+            e.printStackTrace();
         }
         initialize();
     }
@@ -120,54 +130,40 @@ public class GoogleSpeechRecognizer extends com.dydxtech.openapps.SpeechRecogniz
     }
 
     private void initialize() {
-
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(context);
-
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         blackListedApps = (HashSet<String>) prefs.getStringSet("black_listed_apps", new HashSet<String>());
         optimizeEnglish = prefs.getBoolean("optimizeEnglish", true);
         useGetTasks = prefs.getBoolean("use_gettasks", true);
-        mAudioManager = (AudioManager) context
-                .getSystemService(Context.AUDIO_SERVICE);
-        mSpeechRecognizerIntent = new Intent(
-                RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        mSpeechRecognizerIntent.putExtra(
-                RecognizerIntent.EXTRA_CALLING_PACKAGE, context
-                        .getApplicationContext().getPackageName()
-        );
-        mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
+        mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, context.getApplicationContext().getPackageName());
+        mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
         mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(context);
         mSpeechRecognizer.setRecognitionListener(this);
         listenForHotword();
     }
 
     public void listenForHotword() {
-
         listeningPaused = false;
         startListening();
     }
 
     public void stopListening() {
-
         if (isMuted) {
             isMuted = false;
             try {
                 mAudioManager.setStreamMute(BEEP_STREAM, false);
                 mAudioManager.setStreamMute(BEEP_STREAM, false);
             } catch (Exception e) {
+                e.printStackTrace();
             }
-
         }
-        // mAudioManager.setStreamVolume(AudioManager.STREAM_SYSTEM, lastVolume,
-        // 0);
         listeningPaused = true;
         mSpeechRecognizer.cancel();
         mNoSpeechCountDown.cancel();
     }
 
     public void startListening() {
-
         mIsCountDownOn = false;
         listeningPaused = false;
         Message message = Message.obtain(null, MSG_RECOGNIZER_CANCEL);
@@ -176,28 +172,24 @@ public class GoogleSpeechRecognizer extends com.dydxtech.openapps.SpeechRecogniz
             message = Message.obtain(null, MSG_RECOGNIZER_START_LISTENING);
             mServerMessenger.send(message);
         } catch (RemoteException e) {
-
+            e.printStackTrace();
         }
-
     }
 
     public void stop() {
-
         try {
             if (isMuted) {
                 isMuted = false;
                 mAudioManager.setStreamMute(BEEP_STREAM, false);
                 mAudioManager.setStreamMute(BEEP_STREAM, false);
-
             }
             // mAudioManager.setStreamVolume(AudioManager.STREAM_SYSTEM,
             // lastVolume, 0);
             mSpeechRecognizer.destroy();
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
         mNoSpeechCountDown.cancel();
-
     }
 
     @Override
@@ -206,22 +198,17 @@ public class GoogleSpeechRecognizer extends com.dydxtech.openapps.SpeechRecogniz
     }
 
     public boolean checkIfAppBlacklisted() {
-        if (!ScreenReceiver.isScreenOn) {
+        if (!ScreenReceiver.isScreenOn)
             return false;
-        }
-        if (KeyguardReceiver.keyguardEnabled) {
+        if (KeyguardReceiver.keyguardEnabled)
             return false;
-        }
-        ActivityManager am = (ActivityManager) context
-                .getSystemService(Context.ACTIVITY_SERVICE);
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
 
         // get the info from the currently running task
         List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
-
         ComponentName componentInfo = taskInfo.get(0).topActivity;
         componentInfo.getPackageName();
         if ((componentInfo.getPackageName().equals(context.getPackageName()) && useGetTasks) || blackListedApps.contains(componentInfo.getPackageName()) || CheckIfAppBlackListedService.checkIfBlacklistedBecauseOfMic(context, componentInfo.getPackageName())) {
-
             Intent i = new Intent(context, MyService.class);
             i.setAction("GNACTIVATED");
             context.startService(i);
@@ -239,20 +226,17 @@ public class GoogleSpeechRecognizer extends com.dydxtech.openapps.SpeechRecogniz
 
     /**
      * common method to process any results bundle from
-     * {@link com.dydxtech.openapps.GoogleSpeechRecognizer}
+     * {@link GoogleSpeechRecognizer}
      */
     private void receiveResults(Bundle results) {
         if (isMuted) {
             isMuted = false;
-            mAudioManager.setStreamMute(BEEP_STREAM, false);
-            mAudioManager.setStreamMute(BEEP_STREAM, false);
+            mAudioManager.setStreamMute(BEEP_STREAM, isMuted);
+            mAudioManager.setStreamMute(BEEP_STREAM, isMuted);
         }
-        if ((results != null)
-                && results.containsKey(SpeechRecognizer.RESULTS_RECOGNITION)) {
-            List<String> heard = results
-                    .getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+        if ((results != null) && results.containsKey(SpeechRecognizer.RESULTS_RECOGNITION)) {
+            List<String> heard = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
             if (heard == null) {
-
                 startListening();
                 return;
             }
@@ -263,14 +247,35 @@ public class GoogleSpeechRecognizer extends com.dydxtech.openapps.SpeechRecogniz
     }
 
     private void receiveWhatWasHeard(List<String> heard) {
+        stopListening();
         //DEBUG
         Toast.makeText(context, heard.toString(), Toast.LENGTH_LONG).show();
+
+        String userInput = heard.get(0).toLowerCase();
+        String appName = userInput.replace(hotwords.get(0), "").trim();
+
+        //Launch the app by the name
+        try {
+            final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+            mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+            PackageManager pm = context.getPackageManager();
+            final List<ResolveInfo> appList = pm.queryIntentActivities(mainIntent, 0);
+            for (ResolveInfo app : appList) {
+                String name = app.loadLabel(pm).toString().toLowerCase();
+                if (appName.startsWith(name)) {
+                    Intent LaunchIntent = pm.getLaunchIntentForPackage(app.activityInfo.packageName);
+                    context.startActivity(LaunchIntent);
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         if (listener != null) {
             if (!listener.onHeard(heard)) {
                 startListening();
-
             }
-
             return;
         }
         /*
@@ -294,8 +299,7 @@ public class GoogleSpeechRecognizer extends com.dydxtech.openapps.SpeechRecogniz
                     hotwordEncoded = doubleMetaphone.encode(hotword);
                 }
                 try {
-                    if (possibleEncoded.toLowerCase().contains(
-                            hotwordEncoded.toLowerCase())) {
+                    if (possibleEncoded.toLowerCase().contains(hotwordEncoded.toLowerCase())) {
                         if (hotwordIndex <= hotwordCount) {
                             uiReference.HotwordHeard();
                         } else {
@@ -307,19 +311,15 @@ public class GoogleSpeechRecognizer extends com.dydxtech.openapps.SpeechRecogniz
                 }
                 hotwordIndex++;
             }
-
         }
 
         // quietly start again
         startListening();
-
     }
 
     @Override
     public void onError(int errorCode) {
-
-        if (!listeningPaused) // prevent restarting if shouldn't be listening
-        {
+        if (!listeningPaused) { // prevent restarting if shouldn't be listening
             mIsCountDownOn = false;
             Message message = Message.obtain(null, MSG_RECOGNIZER_CANCEL);
             try {
@@ -327,31 +327,26 @@ public class GoogleSpeechRecognizer extends com.dydxtech.openapps.SpeechRecogniz
                 message = Message.obtain(null, MSG_RECOGNIZER_START_LISTENING);
                 mServerMessenger.send(message);
             } catch (RemoteException e) {
-
+                e.printStackTrace();
             }
         }
     }
 
     @Override
     public void onReadyForSpeech(Bundle params) {
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             if (isMuted) {
                 isMuted = false;
                 mAudioManager.setStreamMute(BEEP_STREAM, false);
                 mAudioManager.setStreamMute(BEEP_STREAM, false);
-
             }
             mIsCountDownOn = true;
             mNoSpeechCountDown.start();
-
         }
-
     }
 
     @Override
     public void onEndOfSpeech() {
-
         // Log.d("SpeechRecognizer", "End of speech");
     }
 
@@ -360,11 +355,9 @@ public class GoogleSpeechRecognizer extends com.dydxtech.openapps.SpeechRecogniz
      */
     @Override
     public void onBeginningOfSpeech() {
-
         // Log.d("SpeechRecognizer", "Beginning of speech");
         // speech input will be processed, so there is no need for count down
         // anymore
-
         if (mIsCountDownOn) {
             mIsCountDownOn = false;
             mNoSpeechCountDown.cancel();
@@ -388,9 +381,7 @@ public class GoogleSpeechRecognizer extends com.dydxtech.openapps.SpeechRecogniz
     }
 
     // way to turn on/off speech recognizer without beep (hotword recognition)
-    protected static class IncomingHandler extends Handler
-
-    {
+    protected static class IncomingHandler extends Handler {
         private WeakReference<GoogleSpeechRecognizer> mtarget;
 
         IncomingHandler(GoogleSpeechRecognizer target) {
@@ -407,16 +398,13 @@ public class GoogleSpeechRecognizer extends com.dydxtech.openapps.SpeechRecogniz
                             Intent i = new Intent(target.context, MyService.class);
                             i.setAction("GNACTIVATED");
                             target.context.startService(i);
-                            i = new Intent(target.context,
-                                    CheckIfMusicPlayingService.class);
+                            i = new Intent(target.context, CheckIfMusicPlayingService.class);
                             target.context.startService(i);
                             return;
                         }
-
                         if (target.checkIfAppBlacklisted()) {
                             return;
                         }
-
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                             // turn off beep sound
                             // MySpeechRecognizer.lastVolume =
@@ -425,32 +413,24 @@ public class GoogleSpeechRecognizer extends com.dydxtech.openapps.SpeechRecogniz
                             // 0, 0);
                             if (!GoogleSpeechRecognizer.isMuted) {
                                 isMuted = true;
-                                target.mAudioManager.setStreamMute(
-                                        BEEP_STREAM, true);
-
+                                target.mAudioManager.setStreamMute(BEEP_STREAM, true);
                             }
                         }
                         if (!target.mIsListening) {
-                            target.mSpeechRecognizer
-                                    .startListening(target.mSpeechRecognizerIntent);
+                            target.mSpeechRecognizer.startListening(target.mSpeechRecognizerIntent);
                             target.mIsListening = true;
                             //Log.d(TAG, "message start listening"); //$NON-NLS-1$
                         }
-
                         break;
-
                     case MSG_RECOGNIZER_CANCEL:
                         target.mSpeechRecognizer.cancel();
                         target.mIsListening = false;
                         //Log.d(TAG, "message canceled recognizer"); //$NON-NLS-1$
                         break;
-
                 }
-
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
         }
-
     }
 }

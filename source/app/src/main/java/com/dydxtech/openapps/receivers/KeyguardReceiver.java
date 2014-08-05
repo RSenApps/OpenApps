@@ -1,4 +1,4 @@
-package com.dydxtech.openapps;
+package com.dydxtech.openapps.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
