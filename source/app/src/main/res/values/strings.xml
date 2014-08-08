@@ -7,5 +7,6 @@
     <string name="title_activity_launch">LaunchActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="how_to">Just say \"Open\" followed by the app\'s name. Like \"Open Settings.\"</string>
 
 </resources>
