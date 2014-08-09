@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -209,7 +210,7 @@ public class GoogleSpeechRecognizer extends com.dydxtech.openapps.speech.SpeechR
         List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
         ComponentName componentInfo = taskInfo.get(0).topActivity;
         componentInfo.getPackageName();
-        if ((componentInfo.getPackageName().equals(context.getPackageName()) && useGetTasks) || blackListedApps.contains(componentInfo.getPackageName()) || CheckIfAppBlackListedService.checkIfBlacklistedBecauseOfMic(context, componentInfo.getPackageName())) {
+        if (blackListedApps.contains(componentInfo.getPackageName()) || CheckIfAppBlackListedService.checkIfBlacklistedBecauseOfMic(context, componentInfo.getPackageName())) {
             Intent i = new Intent(context, MyService.class);
             i.setAction("GNACTIVATED");
             context.startService(i);
@@ -252,24 +253,24 @@ public class GoogleSpeechRecognizer extends com.dydxtech.openapps.speech.SpeechR
         // find the target word
         for (String possible : heard) {
 
-            int hotwordIndex = 1;
             for (String hotword : hotwords) {
 
                 try {
                     if (possible.toLowerCase().contains(hotword.toLowerCase())) {
-                        if (hotwordIndex <= hotwordCount) {
+
                             String pkgName = getPackageNameForApp(possible.split(hotword) [1]);//gets part after hotword
                             if (pkgName != null) {
+                                final MediaPlayer mp = MediaPlayer.create(context, R.raw.heard);
+                                mp.start();
                                 uiReference.HotwordHeard(pkgName);
+                                startListening();
+                                return;
                             }
-                        } else {
-                            startListening();
-                        }
-                        return;
+
+                        //return;
                     }
                 } catch (Exception e) {
                 }
-                hotwordIndex++;
             }
         }
         // quietly start again

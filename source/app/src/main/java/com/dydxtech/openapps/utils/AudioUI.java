@@ -121,12 +121,13 @@ public class AudioUI {
         }
 
         WakelockManager.turnOnScreen(context);
+        /*
         if (prefs.getBoolean("use_gettasks", true)) {
             i = new Intent(context, MyService.class);
             i.setAction("GNACTIVATED");
             context.startService(i);
         }
-
+        */
         context.startActivity(new Intent(context, WakeupActivity.class)
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK
 

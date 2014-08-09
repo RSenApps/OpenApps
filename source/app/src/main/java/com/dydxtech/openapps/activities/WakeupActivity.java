@@ -36,13 +36,13 @@ public class WakeupActivity extends Activity {
     @Override
     public void onAttachedToWindow() {
         final String pkgName = getIntent().getStringExtra("pkg_name");
+        CheckIfAppBlackListedService.lastLaunchedPackage = pkgName;
         final Handler handler = new Handler();
         final Runnable runnable = new Runnable() {
 
             @Override
             public void run() {
-                final MediaPlayer mp = MediaPlayer.create(WakeupActivity.this, R.raw.heard);
-                mp.start();
+
                 PackageManager pm = getPackageManager();
                 Intent LaunchIntent = pm.getLaunchIntentForPackage(pkgName);
                 startActivity(LaunchIntent);
@@ -61,7 +61,7 @@ public class WakeupActivity extends Activity {
 
         ScreenReceiver.isActivating = false;
 
-        CheckIfAppBlackListedService.blacklisteddetected = true;
+        CheckIfAppBlackListedService.blacklisteddetected = false;
         if (!PreferenceManager.getDefaultSharedPreferences(this).getBoolean("use_gettasks", true)) {
             CheckIfAppBlackListedService.checkingForRelockOnly = true;
         }

@@ -25,6 +25,7 @@ import java.util.List;
 public class CheckIfAppBlackListedService extends Service {
     public static boolean checkingForRelockOnly = false;
     public static boolean blacklisteddetected = false;
+    public static String lastLaunchedPackage = "";
     final Handler checkIfAppBlacklistedDelayed = new Handler();
     Runnable runnable;
 
@@ -84,10 +85,10 @@ public class CheckIfAppBlackListedService extends Service {
                             return;
                         }
                     }
-                    if (!(useGetTasks && componentInfo.getPackageName().equals(
-                            getPackageName())) && !blackListedApps.contains(componentInfo.getPackageName()) && !checkIfBlacklistedBecauseOfMic(CheckIfAppBlackListedService.this, componentInfo.getPackageName()) && !ScreenReceiver.isActivating) {
+                    if (!componentInfo.getPackageName().equals(lastLaunchedPackage) && !blackListedApps.contains(componentInfo.getPackageName()) && !checkIfBlacklistedBecauseOfMic(CheckIfAppBlackListedService.this, componentInfo.getPackageName()) && !ScreenReceiver.isActivating) {
 
-                        if (relock && useGetTasks) {
+                        if (relock && useGetTasks && !componentInfo.getPackageName().equals(lastLaunchedPackage)) {
+                            lastLaunchedPackage = "";
                             try {
                                 AudioUI.lock.reenableKeyguard();
                             } catch (Exception e) {
@@ -105,8 +106,7 @@ public class CheckIfAppBlackListedService extends Service {
                                     MyService.class);
                             startService(i);
                         }
-
-                            stopSelf();
+                         stopSelf();
                     } else {
 
                         checkIfAppBlacklistedDelayed.postDelayed(this, 500);
