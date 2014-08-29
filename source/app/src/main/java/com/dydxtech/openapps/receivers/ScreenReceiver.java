@@ -24,8 +24,8 @@ public class ScreenReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(context);
-		boolean screenOff = prefs.getBoolean("listen_screen_off", true);
-		
+		boolean screenOff = prefs.getBoolean("listen_screen_off", false);
+		boolean runLockScreen = prefs.getBoolean("run_lockscreen", false);
 		if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
 
 			try
@@ -50,7 +50,7 @@ public class ScreenReceiver extends BroadcastReceiver {
 		} else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
 			KeyguardReceiver.keyguardEnabled = true;
 			isScreenOn = true;
-			if (!screenOff) {
+			if (!screenOff && runLockScreen) {
 				final Intent myServiceIntent = new Intent(context,
 						MyService.class);
 				context.startService(myServiceIntent);
